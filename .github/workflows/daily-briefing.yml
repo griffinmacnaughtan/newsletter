@@ -2,9 +2,10 @@ name: Daily Briefing
 
 on:
   schedule:
-    # 11:00 UTC = 7:00 AM Eastern (EDT)
-    # Runs 30 min early to allow fetch + curation time
-    - cron: "0 11 * * *"
+    # Runs at both possible UTC offsets for 7:25 AM Toronto time.
+    # The job checks Toronto local time and skips if outside 7-8 AM window.
+    - cron: "25 11 * * *"  # 7:25 AM EDT (summer)
+    - cron: "25 12 * * *"  # 7:25 AM EST (winter)
   workflow_dispatch: # Manual trigger for testing
 
 jobs:
@@ -24,7 +25,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check Toronto time window
+        id: timecheck
+        run: |
+          TORONTO_HOUR=$(TZ='America/Toronto' date +%H)
+          echo "Toronto hour: $TORONTO_HOUR"
+          if [ "$TORONTO_HOUR" -ge 7 ] && [ "$TORONTO_HOUR" -lt 8 ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+          else
+            echo "Outside 7-8 AM Toronto window, skipping."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Send Daily Briefing
+        if: steps.timecheck.outputs.skip != 'true' || github.event_name == 'workflow_dispatch'
         env:
           NEWSLETTER_SMTP_PASSWORD: ${{ secrets.NEWSLETTER_SMTP_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

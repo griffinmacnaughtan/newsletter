@@ -170,10 +170,19 @@ sources:
     - url: "https://www.sportsnet.ca/feed/"
       categories: ["sports_hockey", "sports_other"]
       tier: 1
-    - url: "https://www.pgatour.com/rss/news.rss"
+    - url: "https://www.tsn.ca/rss/golf"
+      categories: ["sports_golf"]
+      tier: 1
+    - url: "https://www.golfchannel.com/rss"
+      categories: ["sports_golf"]
+      tier: 2
+    - url: "https://www.espn.com/espn/rss/golf/news"
       categories: ["sports_golf"]
       tier: 2
     - url: "https://www.mlb.com/feeds/news/rss.xml"
+      categories: ["sports_other"]
+      tier: 2
+    - url: "https://www.tsn.ca/rss/soccer"
       categories: ["sports_other"]
       tier: 2
 
@@ -184,6 +193,14 @@ sources:
     - url: "https://www.cbc.ca/webfeed/rss/rss-climate"
       categories: ["environment"]
       tier: 1
+
+    # Geopolitics (adding dedicated feeds)
+    - url: "https://feeds.bbci.co.uk/news/world/rss.xml"
+      categories: ["geopolitics"]
+      tier: 1
+    - url: "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+      categories: ["geopolitics"]
+      tier: 2
 
     # Music / Art / Culture
     - url: "https://exclaim.ca/rss"
