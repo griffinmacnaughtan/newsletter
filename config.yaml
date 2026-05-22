@@ -7,8 +7,6 @@ delivery:
   to:
     - "gmacnaughtan@rogers.com"
     - "morganelackey9@gmail.com"
-    # Add more recipients below:
-    # - "friend@example.com"
   from: "griffin.mac12@gmail.com"
   smtp_server: "smtp.gmail.com"
   smtp_port: 587

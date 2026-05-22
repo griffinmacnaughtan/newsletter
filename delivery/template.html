@@ -394,22 +394,25 @@
   {% endif %}
 
   <!-- Feedback -->
-  <div class="card" style="padding: 22px 28px;">
-    <div class="section-label">Quick feedback</div>
-    <div style="font-size: 13px; color: #888; margin-bottom: 14px;">One tap. Creates a trackable issue. Agent fixes it.</div>
-    <div class="feedback-row" style="text-align: left; margin: 0;">
-      <a href="{{ fb_missing_stories }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Missing stories</a>
-      <a href="{{ fb_wrong_section }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Wrong section</a>
-      <a href="{{ fb_too_much_cbc }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Too much of one source</a>
-      <a href="{{ fb_tone }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Language not neutral</a>
-      <a href="{{ fb_weak_section }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Section too thin</a>
-      <a href="{{ fb_great }}" class="feedback-btn fb-great" style="display: inline-block; margin: 3px 4px 3px 0;">No notes, great edition</a>
+  <div class="card" style="padding: 20px 28px;">
+    <div class="section-label" style="margin-bottom: 12px;">How was today's briefing?</div>
+    <div style="text-align: left; margin: 0; line-height: 2.2;">
+      <a href="{{ fb_great }}" style="display: inline-block; padding: 5px 16px; margin: 2px 3px 2px 0; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; letter-spacing: 0.3px; background: #1a1a1a; color: #ffffff;">Great edition</a>
+      <a href="{{ fb_missing_stories }}" style="display: inline-block; padding: 5px 16px; margin: 2px 3px 2px 0; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; letter-spacing: 0.3px; background: #f0f0ee; color: #666;">Missing stories</a>
+      <a href="{{ fb_wrong_section }}" style="display: inline-block; padding: 5px 16px; margin: 2px 3px 2px 0; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; letter-spacing: 0.3px; background: #f0f0ee; color: #666;">Wrong section</a>
+      <a href="{{ fb_too_much_cbc }}" style="display: inline-block; padding: 5px 16px; margin: 2px 3px 2px 0; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; letter-spacing: 0.3px; background: #f0f0ee; color: #666;">Source balance</a>
+      <a href="{{ fb_tone }}" style="display: inline-block; padding: 5px 16px; margin: 2px 3px 2px 0; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; letter-spacing: 0.3px; background: #f0f0ee; color: #666;">Tone</a>
+      <a href="{{ fb_weak_section }}" style="display: inline-block; padding: 5px 16px; margin: 2px 3px 2px 0; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; letter-spacing: 0.3px; background: #f0f0ee; color: #666;">Thin section</a>
     </div>
   </div>
 
   <!-- Footer -->
   <div class="footer">
-    <div class="footer-mark"></div>
+    <div style="margin-bottom: 14px;">
+      <a href="https://www.linkedin.com/in/griffin-macnaughtan/" style="text-decoration: none;">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="20" height="20" style="display:inline-block;width:20px;height:20px;opacity:0.35;">
+      </a>
+    </div>
     <div class="footer-text">
       Sourced from wire services, public feeds, and community signals.<br>
       Curated for objectivity. No editorial judgment applied.
