@@ -32,7 +32,12 @@ def send_email(html_content: str, config: dict = None) -> bool:
         config = load_config()
 
     delivery = config["delivery"]
-    to_addr = delivery["to"]
+    # Support single address or list of addresses
+    to_config = delivery["to"]
+    if isinstance(to_config, list):
+        to_addrs = to_config
+    else:
+        to_addrs = [to_config]
     from_addr = delivery["from"]
     sender_name = delivery.get("sender_name", "The Daily Briefing")
     smtp_server = delivery["smtp_server"]
@@ -52,7 +57,7 @@ def send_email(html_content: str, config: dict = None) -> bool:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = formataddr((sender_name, from_addr))
-    msg["To"] = to_addr
+    msg["To"] = ", ".join(to_addrs)
 
     # Plain text fallback
     plain_text = "Your Daily Briefing is ready. View this email in HTML for the full experience."
@@ -66,9 +71,9 @@ def send_email(html_content: str, config: dict = None) -> bool:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
             server.login(from_addr, password)
-            server.sendmail(from_addr, to_addr, msg.as_string())
+            server.sendmail(from_addr, to_addrs, msg.as_string())
 
-        print(f"[OK] Newsletter sent to {to_addr}")
+        print(f"[OK] Newsletter sent to {', '.join(to_addrs)}")
         return True
 
     except smtplib.SMTPAuthenticationError:

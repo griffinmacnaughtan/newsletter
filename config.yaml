@@ -4,7 +4,10 @@
 
 # --- Delivery Settings ---
 delivery:
-  to: "gmacnaughtan@rogers.com"
+  to:
+    - "gmacnaughtan@rogers.com"
+    # Add more recipients below:
+    # - "friend@example.com"
   from: "griffin.mac12@gmail.com"
   smtp_server: "smtp.gmail.com"
   smtp_port: 587
