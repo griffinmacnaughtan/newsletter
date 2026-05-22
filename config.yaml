@@ -147,12 +147,18 @@ sources:
     - url: "https://techcrunch.com/feed/"
       categories: ["tech_ai_data"]
       tier: 2
+    - url: "https://www.theverge.com/rss/index.xml"
+      categories: ["tech_ai_data"]
+      tier: 2
     - url: "https://www.technologyreview.com/feed/"
       categories: ["tech_ai_data"]
       tier: 2
     - url: "https://arstechnica.com/feed/"
       categories: ["tech_ai_data"]
       tier: 2
+    - url: "https://feeds.reuters.com/reuters/businessNews"
+      categories: ["tech_ai_data", "geopolitics"]
+      tier: 1
     - url: "https://blog.google/technology/ai/rss/"
       categories: ["tech_ai_data"]
       tier: 2

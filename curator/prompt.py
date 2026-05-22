@@ -35,6 +35,11 @@ SECTION PLACEMENT RULES:
 - culture: Music releases, concerts, art exhibitions, film festivals, Toronto cultural events, book releases. NOT tech industry lawsuits or business disputes.
 - radar: Quick one-liners for items that are worth noting but don't merit a full summary. Good for local Toronto items, recalls, transit, minor transactions.
 
+MUST-COVER RULE:
+- Major layoffs, earnings, acquisitions, or outages at FAANG/big tech companies (Meta, Google, Apple, Amazon, Microsoft, Nvidia, OpenAI, Anthropic, Databricks, Snowflake) MUST appear in tech_ai. These are never optional.
+- Major trades, injuries, or playoff results involving Toronto teams (Leafs, Jays, TFC, Raptors) MUST appear in sports. These are never optional.
+- If a must-cover item exists in the raw data but was not included, the briefing is incomplete.
+
 SOURCE DIVERSITY:
 - Actively prefer wire services (Reuters, AP, Canadian Press) and varied outlets over repeating the same source.
 - If 3+ items in a section all come from the same outlet, consider whether alternate-sourced items were overlooked.
