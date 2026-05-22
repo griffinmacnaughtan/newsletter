@@ -2,10 +2,10 @@ name: Daily Briefing
 
 on:
   schedule:
-    # Runs at both possible UTC offsets for 7:25 AM Toronto time.
-    # The job checks Toronto local time and skips if outside 7-8 AM window.
-    - cron: "25 11 * * *"  # 7:25 AM EDT (summer)
-    - cron: "25 12 * * *"  # 7:25 AM EST (winter)
+    # Two crons cover both DST offsets for ~7:25 AM Toronto.
+    # The job checks which cron fired and skips the wrong-season one.
+    - cron: "25 11 * * *"  # 7:25 AM EDT (summer, UTC-4)
+    - cron: "25 12 * * *"  # 7:25 AM EST (winter, UTC-5)
   workflow_dispatch: # Manual trigger for testing
 
 jobs:
@@ -25,15 +25,27 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Check Toronto time window
+      - name: Check correct seasonal trigger
         id: timecheck
         run: |
-          TORONTO_HOUR=$(TZ='America/Toronto' date +%H)
-          echo "Toronto hour: $TORONTO_HOUR"
-          if [ "$TORONTO_HOUR" -ge 7 ] && [ "$TORONTO_HOUR" -lt 8 ]; then
+          # Instead of checking wall clock (unreliable due to GH cron delays),
+          # check which cron expression fired vs current DST offset.
+          OFFSET=$(TZ='America/Toronto' date +%z)
+          echo "Toronto UTC offset: $OFFSET"
+          if [ "$OFFSET" = "-0400" ]; then
+            EXPECTED="25 11 * * *"
+            echo "EDT (summer) — expecting 11:25 UTC trigger"
+          else
+            EXPECTED="25 12 * * *"
+            echo "EST (winter) — expecting 12:25 UTC trigger"
+          fi
+          ACTUAL="${{ github.event.schedule }}"
+          echo "Expected cron: $EXPECTED"
+          echo "Actual cron:   $ACTUAL"
+          if [ "$ACTUAL" = "$EXPECTED" ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
           else
-            echo "Outside 7-8 AM Toronto window, skipping."
+            echo "Wrong seasonal trigger, skipping."
             echo "skip=true" >> $GITHUB_OUTPUT
           fi
 
