@@ -1,0 +1,31 @@
+name: Daily Briefing
+
+on:
+  schedule:
+    # 11:00 UTC = 7:00 AM Eastern (EDT)
+    # Runs 30 min early to allow fetch + curation time
+    - cron: "0 11 * * *"
+  workflow_dispatch: # Manual trigger for testing
+
+jobs:
+  send-briefing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send Daily Briefing
+        env:
+          NEWSLETTER_SMTP_PASSWORD: ${{ secrets.NEWSLETTER_SMTP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python main.py

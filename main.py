@@ -12,7 +12,7 @@ Usage:
 import sys
 import json
 import yaml
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -71,6 +71,12 @@ def run_send(html: str, config: dict) -> bool:
     """Step 4: Send via SMTP."""
     print("\n[4/4] Sending email...")
     return send_email(html, config=config)
+
+
+def now_toronto() -> datetime:
+    """Get current time in Toronto (UTC-4 EDT / UTC-5 EST)."""
+    eastern = timezone(timedelta(hours=-4))  # EDT
+    return datetime.now(eastern)
 
 
 def main():
