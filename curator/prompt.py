@@ -40,9 +40,12 @@ MUST-COVER RULE:
 - Major trades, injuries, or playoff results involving Toronto teams (Leafs, Jays, TFC, Raptors) MUST appear in sports. These are never optional.
 - If a must-cover item exists in the raw data but was not included, the briefing is incomplete.
 
-SOURCE DIVERSITY:
-- Actively prefer wire services (Reuters, AP, Canadian Press) and varied outlets over repeating the same source.
-- If 3+ items in a section all come from the same outlet, consider whether alternate-sourced items were overlooked.
+SOURCE DIVERSITY (strict):
+- HARD LIMIT: No more than 2 items from the same outlet per section. If you have 3 CBC items in a section, replace one with a different source covering a similar topic.
+- HARD LIMIT: Across the entire briefing, no single outlet should account for more than 25% of all items. Count before finalizing.
+- Actively prefer wire services (Reuters, AP, Canadian Press) for breaking news, and use varied outlets for depth.
+- CBC, Globe and Mail, and CTV are all Canadian outlets. Rotate between them rather than stacking one.
+- When two sources cover the same story, prefer the wire service or the outlet that is NOT already overrepresented in the briefing.
 
 OUTPUT FORMAT:
 Return a JSON object with this structure:

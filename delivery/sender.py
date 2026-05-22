@@ -1,6 +1,7 @@
 """
 Email Sender
 Sends the formatted HTML email via Gmail SMTP.
+Embeds the header image as a CID attachment for universal email client support.
 """
 
 import smtplib
@@ -8,9 +9,13 @@ import os
 import yaml
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 from email.utils import formataddr
 from datetime import datetime
 from pathlib import Path
+
+
+HEADER_IMAGE = Path(__file__).parent / "assets" / "header.jpg"
 
 
 def load_config() -> dict:
@@ -50,28 +55,43 @@ def send_email(html_content: str, config: dict = None) -> bool:
         print("  Generate an app password at: https://myaccount.google.com/apppasswords")
         return False
 
-    # Build the email
+    # Build the email with related parts (for CID image embedding)
     today = datetime.now().strftime("%B %d, %Y")
     subject = f"{delivery['subject_prefix']}  |  {today}"
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = formataddr((sender_name, from_addr))
-    msg["To"] = ", ".join(to_addrs)
+    # Outer: "related" wraps the content + inline images
+    msg_root = MIMEMultipart("related")
+    msg_root["Subject"] = subject
+    msg_root["From"] = formataddr((sender_name, from_addr))
+    msg_root["To"] = ", ".join(to_addrs)
+
+    # Inner: "alternative" holds plain text + HTML
+    msg_alt = MIMEMultipart("alternative")
+    msg_root.attach(msg_alt)
 
     # Plain text fallback
     plain_text = "Your Daily Briefing is ready. View this email in HTML for the full experience."
-    msg.attach(MIMEText(plain_text, "plain"))
+    msg_alt.attach(MIMEText(plain_text, "plain"))
 
     # HTML content
-    msg.attach(MIMEText(html_content, "html"))
+    msg_alt.attach(MIMEText(html_content, "html"))
+
+    # Embed header image as inline attachment
+    if HEADER_IMAGE.exists():
+        with open(HEADER_IMAGE, "rb") as img_f:
+            img = MIMEImage(img_f.read(), _subtype="jpeg")
+            img.add_header("Content-ID", "<header-image>")
+            img.add_header("Content-Disposition", "inline", filename="header.jpg")
+            msg_root.attach(img)
+    else:
+        print(f"[WARN] Header image not found at {HEADER_IMAGE}")
 
     # Send
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
             server.login(from_addr, password)
-            server.sendmail(from_addr, to_addrs, msg.as_string())
+            server.sendmail(from_addr, to_addrs, msg_root.as_string())
 
         print(f"[OK] Newsletter sent to {', '.join(to_addrs)}")
         return True
