@@ -44,12 +44,24 @@ def curate_items(raw_items: list[dict], date: str = None) -> dict:
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=4096,
+        max_tokens=8192,
         system=SYSTEM_PROMPT,
         messages=[
             {"role": "user", "content": user_prompt}
         ],
     )
+
+    # Check if response was truncated
+    if response.stop_reason == "max_tokens":
+        print("[WARN] Claude response hit token limit, retrying with higher limit...")
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=16384,
+            system=SYSTEM_PROMPT,
+            messages=[
+                {"role": "user", "content": user_prompt}
+            ],
+        )
 
     # Extract JSON from response
     response_text = response.content[0].text
