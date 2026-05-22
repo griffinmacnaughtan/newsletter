@@ -1,0 +1,160 @@
+name: Weekly Review
+
+on:
+  schedule:
+    # Sunday 8 PM Toronto (Monday 00:00 or 01:00 UTC depending on DST)
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests pyyaml
+
+      - name: Download health artifacts from past week
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p weekly_health
+          # List recent artifacts
+          gh api repos/${{ github.repository }}/actions/artifacts \
+            --jq '.artifacts[] | select(.name | startswith("health-")) | .id' \
+            | head -7 | while read AID; do
+              gh api repos/${{ github.repository }}/actions/artifacts/$AID/zip \
+                > "weekly_health/$AID.zip" 2>/dev/null && \
+              cd weekly_health && unzip -o "$AID.zip" 2>/dev/null; cd ..
+            done || true
+          ls -la weekly_health/
+
+      - name: Generate weekly review
+        id: review
+        run: |
+          python - << 'PYEOF'
+          import json, glob, os
+          from collections import Counter
+          from pathlib import Path
+
+          reports = []
+          for f in glob.glob("weekly_health/health_*.json"):
+              with open(f) as fh:
+                  reports.append(json.load(fh))
+
+          if not reports:
+              print("No health reports found for this week.")
+              body = "No health reports found. Check that daily runs are completing.\n"
+              with open(os.environ["GITHUB_OUTPUT"], "a") as gh:
+                  gh.write("has_issues=false\n")
+              with open("weekly_summary.md", "w") as f:
+                  f.write(body)
+              exit(0)
+
+          reports.sort(key=lambda r: r["date"])
+          days = len(reports)
+
+          # Aggregate failed feeds
+          feed_failures = Counter()
+          for r in reports:
+              for feed in r["source_health"]["failed_feeds"]:
+                  feed_failures[feed] += 1
+
+          # Aggregate empty sections
+          section_zeros = Counter()
+          for r in reports:
+              for section, count in r["section_coverage"].items():
+                  if count == 0:
+                      section_zeros[section] += 1
+
+          # Source diversity
+          all_dominant = []
+          for r in reports:
+              ds = r.get("source_diversity", {}).get("dominant_source")
+              if ds:
+                  all_dominant.append(ds)
+
+          avg_dominant_pct = 0
+          if all_dominant:
+              avg_dominant_pct = round(sum(d["percentage"] for d in all_dominant) / len(all_dominant))
+
+          # Avg raw items
+          avg_raw = round(sum(r["source_health"]["total_raw_items"] for r in reports) / days)
+
+          # Build summary
+          lines = []
+          lines.append(f"## Weekly Newsletter Health Review")
+          lines.append(f"**Period:** {reports[0]['date']} to {reports[-1]['date']} ({days} days)")
+          lines.append(f"**Avg raw items:** {avg_raw}")
+          lines.append(f"**Avg dominant source:** {avg_dominant_pct}%")
+          lines.append("")
+
+          has_issues = False
+
+          if feed_failures:
+              chronic = {k: v for k, v in feed_failures.items() if v >= 3}
+              if chronic:
+                  has_issues = True
+                  lines.append("### Dead Feeds (failed 3+ days)")
+                  for feed, count in sorted(chronic.items(), key=lambda x: -x[1]):
+                      lines.append(f"- `{feed}` - failed {count}/{days} days")
+                  lines.append("")
+                  lines.append("**Action:** Consider removing or replacing these feeds in `config.yaml`.")
+                  lines.append("")
+
+          if section_zeros:
+              chronic_sections = {k: v for k, v in section_zeros.items() if v >= 3}
+              if chronic_sections:
+                  has_issues = True
+                  lines.append("### Empty Sections (0 items 3+ days)")
+                  for section, count in sorted(chronic_sections.items(), key=lambda x: -x[1]):
+                      lines.append(f"- **{section}** - empty {count}/{days} days")
+                  lines.append("")
+                  lines.append("**Action:** Add more sources for these categories or adjust interest weights.")
+                  lines.append("")
+
+          if avg_dominant_pct > 50:
+              has_issues = True
+              top_source = Counter(d["name"] for d in all_dominant).most_common(1)[0][0]
+              lines.append(f"### Source Concentration")
+              lines.append(f"- **{top_source}** averages {avg_dominant_pct}% of curated items")
+              lines.append("- **Action:** Add diverse sources or adjust curation prompt.")
+              lines.append("")
+
+          if not has_issues:
+              lines.append("### All Clear")
+              lines.append("No recurring issues detected this week. Pipeline is healthy.")
+              lines.append("")
+
+          body = "\n".join(lines)
+          with open("weekly_summary.md", "w") as f:
+              f.write(body)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as gh:
+              gh.write(f"has_issues={'true' if has_issues else 'false'}\n")
+
+          print(body)
+          PYEOF
+
+      - name: Create issue if problems found
+        if: steps.review.outputs.has_issues == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(TZ='America/Toronto' date +%Y-%m-%d)
+          gh issue create \
+            --title "Weekly Review: issues detected ($DATE)" \
+            --body-file weekly_summary.md \
+            --label "health"

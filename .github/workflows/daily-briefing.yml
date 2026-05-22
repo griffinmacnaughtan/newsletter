@@ -43,3 +43,11 @@ jobs:
           NEWSLETTER_SMTP_PASSWORD: ${{ secrets.NEWSLETTER_SMTP_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python main.py
+
+      - name: Upload health report
+        if: always() && (steps.timecheck.outputs.skip != 'true' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-${{ github.run_id }}
+          path: output/health/
+          retention-days: 30

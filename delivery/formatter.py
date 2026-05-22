@@ -4,8 +4,18 @@ Takes the curated briefing JSON and renders it as HTML email.
 """
 
 from datetime import datetime
+from urllib.parse import quote
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
+
+REPO = "griffinmacnaughtan/newsletter"
+
+
+def make_feedback_url(date: str, rating: str) -> str:
+    """Generate a GitHub Issue URL pre-filled with feedback."""
+    title = quote(f"Feedback {date}: {rating}")
+    body = quote(f"Rating: {rating}\nDate: {date}\n\n_Optional: add notes here_")
+    return f"https://github.com/{REPO}/issues/new?title={title}&body={body}&labels=feedback"
 
 
 def format_email(briefing: dict) -> str:
@@ -36,43 +46,9 @@ def format_email(briefing: dict) -> str:
         environment=briefing.get("environment", []),
         culture=briefing.get("culture", []),
         radar=briefing.get("radar", []),
+        feedback_url_great=make_feedback_url(date_str, "great"),
+        feedback_url_good=make_feedback_url(date_str, "good"),
+        feedback_url_fix=make_feedback_url(date_str, "needs-work"),
     )
 
     return html
-
-
-if __name__ == "__main__":
-    # Test with sample data
-    sample_briefing = {
-        "date": "2026-05-22",
-        "lead_stories": [
-            {
-                "headline": "Bank of Canada holds rate at 3.25%",
-                "summary": "The central bank maintained its overnight rate, citing stable inflation at 2.1%. [Canadian Press]",
-                "source": "Canadian Press",
-                "url": "https://example.com",
-            }
-        ],
-        "tech_ai": [
-            {
-                "headline": "Anthropic releases Claude 4.5 Opus",
-                "summary": "New model benchmarks 12% improvement on coding tasks. Available via API immediately. [Reuters Technology]",
-                "source": "Reuters",
-                "url": "https://example.com",
-            }
-        ],
-        "sports": [],
-        "canada": [],
-        "world": [],
-        "environment": [],
-        "culture": [],
-        "radar": [
-            {"headline": "TTC announces weekend Line 2 closure for maintenance", "source": "CBC Toronto", "url": "https://example.com"},
-        ],
-    }
-
-    html = format_email(sample_briefing)
-    # Write test output
-    with open(template_dir / "test_output.html", "w") as f:
-        f.write(html)
-    print("Test email written to delivery/test_output.html")

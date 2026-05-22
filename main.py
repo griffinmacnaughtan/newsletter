@@ -23,6 +23,7 @@ from sources import fetch_all_sources
 from curator.process import curate_items
 from delivery.formatter import format_email
 from delivery.sender import send_email
+from health.diagnostics import run_diagnostics, save_report, print_report
 
 
 def load_config() -> dict:
@@ -214,8 +215,14 @@ def main():
     # Step 4: Send
     success = run_send(html, config)
 
+    # Step 5: Health diagnostics
+    print("\n[5/5] Running diagnostics...")
+    health = run_diagnostics(raw_items, briefing, config)
+    health_path = save_report(health, output_dir)
+    print_report(health)
+
     if success:
-        print("\n" + "=" * 60)
+        print("=" * 60)
         print("BRIEFING SENT SUCCESSFULLY")
         print("=" * 60)
     else:
