@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Daily Briefing | {{ date }}</title>
+<!--[if mso]>
+<noscript>
+<xml>
+<o:OfficeDocumentSettings>
+<o:PixelsPerInch>96</o:PixelsPerInch>
+</o:OfficeDocumentSettings>
+</xml>
+</noscript>
+<![endif]-->
+<style>
+  /* Reset */
+  body, table, td, p, a, li { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  body { margin: 0; padding: 0; width: 100% !important; -webkit-font-smoothing: antialiased; }
+  img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+
+  /* Core */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f7f7f5;
+    color: #1a1a1a;
+  }
+
+  .wrapper {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 32px 0 28px 0;
+  }
+  .header-mark {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    line-height: 44px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .header-mark span {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    margin: 0 0 6px 0;
+  }
+  .header-date {
+    font-size: 13px;
+    color: #8a8a8a;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+  .header-divider {
+    width: 40px;
+    height: 2px;
+    background: #1a1a1a;
+    margin: 20px auto 0 auto;
+    border: none;
+  }
+
+  /* Card */
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px 28px 20px 28px;
+    margin-bottom: 16px;
+  }
+
+  /* Section */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8a8a8a;
+    margin: 0 0 20px 0;
+    padding: 0;
+  }
+
+  /* Items */
+  .item {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0ee;
+  }
+  .item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .item-headline {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-decoration: underline;
+    text-decoration-color: #d4d4d0;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    line-height: 1.45;
+    display: block;
+    letter-spacing: -0.2px;
+  }
+  .item-headline:hover {
+    text-decoration-color: #1a1a1a;
+    color: #1a1a1a;
+  }
+  .item-summary {
+    font-size: 14px;
+    color: #555;
+    margin: 6px 0 0 0;
+    line-height: 1.55;
+    font-weight: 400;
+  }
+  .item-meta {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 8px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Lead items */
+  .lead-item {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f0f0ee;
+  }
+  .lead-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .lead-headline {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-decoration: underline;
+    text-decoration-color: #d4d4d0;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1.5px;
+    line-height: 1.4;
+    display: block;
+    letter-spacing: -0.3px;
+  }
+  .lead-headline:hover {
+    text-decoration-color: #1a1a1a;
+    color: #1a1a1a;
+  }
+  .lead-summary {
+    font-size: 15px;
+    color: #444;
+    margin: 8px 0 0 0;
+    line-height: 1.55;
+    font-weight: 400;
+  }
+  .lead-meta {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Radar */
+  .radar-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0ee;
+  }
+  .radar-item:last-child {
+    border-bottom: none;
+  }
+  .radar-link {
+    font-size: 14px;
+    color: #1a1a1a;
+    text-decoration: underline;
+    text-decoration-color: #d4d4d0;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .radar-link:hover {
+    text-decoration-color: #1a1a1a;
+    color: #1a1a1a;
+  }
+  .radar-source {
+    font-size: 11px;
+    color: #bbb;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    margin-left: 6px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 28px 0 12px 0;
+  }
+  .footer-text {
+    font-size: 11px;
+    color: #bbb;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+  }
+  .footer-mark {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #d4d4d0;
+    border-radius: 50%;
+    margin-bottom: 12px;
+  }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    .wrapper { padding: 20px 12px; }
+    .card { padding: 22px 20px 16px 20px; border-radius: 12px; }
+    .header { padding: 24px 0 22px 0; }
+    .lead-headline { font-size: 17px; }
+    .item-headline { font-size: 15px; }
+    .item-summary { font-size: 13px; }
+    .lead-summary { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-mark"><span>db</span></div>
+    <div class="header-title">Daily Briefing</div>
+    <div class="header-date">{{ date_formatted }}</div>
+    <hr class="header-divider">
+  </div>
+
+  {% if lead_stories %}
+  <!-- Lead Stories -->
+  <div class="card">
+    <div class="section-label">Top Stories</div>
+    {% for item in lead_stories %}
+    <div class="lead-item">
+      <a href="{{ item.url }}" class="lead-headline">{{ item.headline }}</a>
+      <div class="lead-summary">{{ item.summary }}</div>
+      <div class="lead-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if tech_ai %}
+  <!-- Tech & AI -->
+  <div class="card">
+    <div class="section-label">Tech + AI</div>
+    {% for item in tech_ai %}
+    <div class="item">
+      <a href="{{ item.url }}" class="item-headline">{{ item.headline }}</a>
+      <div class="item-summary">{{ item.summary }}</div>
+      <div class="item-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if sports %}
+  <!-- Sports -->
+  <div class="card">
+    <div class="section-label">Sports</div>
+    {% for item in sports %}
+    <div class="item">
+      <a href="{{ item.url }}" class="item-headline">{{ item.headline }}</a>
+      <div class="item-summary">{{ item.summary }}</div>
+      <div class="item-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if canada %}
+  <!-- Canada -->
+  <div class="card">
+    <div class="section-label">Canada</div>
+    {% for item in canada %}
+    <div class="item">
+      <a href="{{ item.url }}" class="item-headline">{{ item.headline }}</a>
+      <div class="item-summary">{{ item.summary }}</div>
+      <div class="item-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if world %}
+  <!-- World -->
+  <div class="card">
+    <div class="section-label">World</div>
+    {% for item in world %}
+    <div class="item">
+      <a href="{{ item.url }}" class="item-headline">{{ item.headline }}</a>
+      <div class="item-summary">{{ item.summary }}</div>
+      <div class="item-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if environment %}
+  <!-- Environment -->
+  <div class="card">
+    <div class="section-label">Environment</div>
+    {% for item in environment %}
+    <div class="item">
+      <a href="{{ item.url }}" class="item-headline">{{ item.headline }}</a>
+      <div class="item-summary">{{ item.summary }}</div>
+      <div class="item-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if culture %}
+  <!-- Culture -->
+  <div class="card">
+    <div class="section-label">Culture</div>
+    {% for item in culture %}
+    <div class="item">
+      <a href="{{ item.url }}" class="item-headline">{{ item.headline }}</a>
+      <div class="item-summary">{{ item.summary }}</div>
+      <div class="item-meta">{{ item.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if radar %}
+  <!-- Radar -->
+  <div class="card">
+    <div class="section-label">On Your Radar</div>
+    {% for item in radar %}
+    <div class="radar-item">
+      <a href="{{ item.url }}" class="radar-link">{{ item.headline }}</a>
+      <span class="radar-source">{{ item.source }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-mark"></div>
+    <div class="footer-text">
+      Sourced from wire services, public feeds, and community signals.<br>
+      Curated for objectivity. No editorial judgment applied.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+# =============================================================================
+# DAILY BRIEFING — Configuration
+# =============================================================================
+
+# --- Delivery Settings ---
+delivery:
+  to: "gmacnaughtan@rogers.com"
+  from: "griffin.mac12@gmail.com"
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  # App password stored in environment variable NEWSLETTER_SMTP_PASSWORD
+  # Generate at: https://myaccount.google.com/apppasswords
+  sender_name: "The Daily Briefing"
+  subject_prefix: "Daily Briefing"
+  send_time: "07:30"
+  timezone: "America/Toronto"
+
+# --- Interest Profile ---
+# Priority order matters. Higher = more space in the newsletter.
+# Weight 1-10 determines relative allocation.
+interests:
+  - category: "tech_ai_data"
+    weight: 10
+    keywords:
+      - "artificial intelligence"
+      - "machine learning"
+      - "data engineering"
+      - "data pipeline"
+      - "LLM"
+      - "cloud infrastructure"
+      - "asset management technology"
+      - "fintech"
+      - "databricks"
+      - "snowflake"
+      - "dbt"
+      - "apache spark"
+      - "kubernetes"
+
+  - category: "sports_hockey"
+    weight: 8
+    keywords:
+      - "NHL"
+      - "Toronto Maple Leafs"
+      - "hockey"
+      - "Hockey Canada"
+    focus: "Toronto/Canada priority, then league-wide"
+
+  - category: "sports_golf"
+    weight: 6
+    keywords:
+      - "PGA Tour"
+      - "golf"
+      - "Canadian Open"
+      - "Corey Conners"
+      - "Mackenzie Hughes"
+      - "Nick Taylor"
+
+  - category: "sports_other"
+    weight: 5
+    keywords:
+      - "skiing"
+      - "alpine skiing"
+      - "Toronto FC"
+      - "Canadian Premier League"
+      - "MLS"
+      - "Toronto Blue Jays"
+      - "MLB"
+    focus: "Toronto/Canada first, broader if significant"
+
+  - category: "canadian_politics"
+    weight: 7
+    keywords:
+      - "federal government canada"
+      - "ontario government"
+      - "toronto city council"
+      - "canadian policy"
+      - "parliament"
+      - "house of commons"
+    focus: "Municipal > Provincial > Federal priority for Toronto relevance"
+
+  - category: "geopolitics"
+    weight: 6
+    keywords:
+      - "international relations"
+      - "trade agreement"
+      - "NATO"
+      - "G7"
+      - "united nations"
+      - "conflict"
+      - "diplomacy"
+
+  - category: "environment"
+    weight: 6
+    keywords:
+      - "climate"
+      - "renewable energy"
+      - "conservation"
+      - "carbon"
+      - "biodiversity"
+      - "great lakes"
+      - "canadian environment"
+
+  - category: "music_art"
+    weight: 4
+    keywords:
+      - "album release"
+      - "concert"
+      - "toronto music"
+      - "art exhibition"
+      - "gallery"
+      - "film festival"
+      - "TIFF"
+
+# --- Sources ---
+# Organized by type. Each source tagged with categories it covers.
+sources:
+  rss:
+    # Wire Services (primary factual sources)
+    - url: "https://feeds.reuters.com/reuters/topNews"
+      categories: ["geopolitics", "canadian_politics"]
+      tier: 1
+    - url: "https://feeds.reuters.com/reuters/technologyNews"
+      categories: ["tech_ai_data"]
+      tier: 1
+
+    # Canadian News (wire-style)
+    - url: "https://www.cbc.ca/webfeed/rss/rss-topstories"
+      categories: ["canadian_politics", "geopolitics", "environment"]
+      tier: 1
+    - url: "https://www.cbc.ca/webfeed/rss/rss-politics"
+      categories: ["canadian_politics"]
+      tier: 1
+    - url: "https://www.cbc.ca/webfeed/rss/rss-technology"
+      categories: ["tech_ai_data"]
+      tier: 1
+    - url: "https://www.cbc.ca/webfeed/rss/rss-canada"
+      categories: ["canadian_politics", "environment"]
+      tier: 1
+    - url: "https://www.theglobeandmail.com/arc/outboundfeeds/rss/category/politics/"
+      categories: ["canadian_politics"]
+      tier: 1
+    - url: "https://www.theglobeandmail.com/arc/outboundfeeds/rss/category/business/technology/"
+      categories: ["tech_ai_data"]
+      tier: 1
+
+    # Tech / AI / Data
+    - url: "https://techcrunch.com/feed/"
+      categories: ["tech_ai_data"]
+      tier: 2
+    - url: "https://www.technologyreview.com/feed/"
+      categories: ["tech_ai_data"]
+      tier: 2
+    - url: "https://arstechnica.com/feed/"
+      categories: ["tech_ai_data"]
+      tier: 2
+    - url: "https://blog.google/technology/ai/rss/"
+      categories: ["tech_ai_data"]
+      tier: 2
+    - url: "https://openai.com/blog/rss.xml"
+      categories: ["tech_ai_data"]
+      tier: 2
+    - url: "https://www.anthropic.com/rss.xml"
+      categories: ["tech_ai_data"]
+      tier: 2
+
+    # Sports
+    - url: "https://www.tsn.ca/rss/hockey"
+      categories: ["sports_hockey"]
+      tier: 1
+    - url: "https://www.sportsnet.ca/feed/"
+      categories: ["sports_hockey", "sports_other"]
+      tier: 1
+    - url: "https://www.pgatour.com/rss/news.rss"
+      categories: ["sports_golf"]
+      tier: 2
+    - url: "https://www.mlb.com/feeds/news/rss.xml"
+      categories: ["sports_other"]
+      tier: 2
+
+    # Environment
+    - url: "https://thenarwhal.ca/feed/"
+      categories: ["environment"]
+      tier: 2
+    - url: "https://www.cbc.ca/webfeed/rss/rss-climate"
+      categories: ["environment"]
+      tier: 1
+
+    # Music / Art / Culture
+    - url: "https://exclaim.ca/rss"
+      categories: ["music_art"]
+      tier: 2
+    - url: "https://nowtoronto.com/feed"
+      categories: ["music_art", "canadian_politics"]
+      tier: 2
+
+  # Public APIs (no auth required)
+  apis:
+    - name: "hacker_news"
+      endpoint: "https://hacker-news.firebaseio.com/v0"
+      categories: ["tech_ai_data"]
+      top_n: 30
+
+    - name: "reddit"
+      subreddits:
+        - name: "r/MachineLearning"
+          categories: ["tech_ai_data"]
+          top_n: 10
+        - name: "r/dataengineering"
+          categories: ["tech_ai_data"]
+          top_n: 10
+        - name: "r/hockey"
+          categories: ["sports_hockey"]
+          top_n: 10
+        - name: "r/leafs"
+          categories: ["sports_hockey"]
+          top_n: 5
+        - name: "r/toronto"
+          categories: ["canadian_politics", "music_art"]
+          top_n: 10
+        - name: "r/canada"
+          categories: ["canadian_politics", "geopolitics"]
+          top_n: 10
+        - name: "r/CanadaPolitics"
+          categories: ["canadian_politics"]
+          top_n: 10
+
+# --- Output Format ---
+format:
+  sections:
+    - name: "Lead Stories"
+      description: "Top 2-3 developments you need to know"
+      max_items: 3
+    - name: "Tech & AI"
+      max_items: 5
+    - name: "Sports"
+      max_items: 5
+    - name: "Canada"
+      max_items: 4
+    - name: "World"
+      max_items: 3
+    - name: "Environment"
+      max_items: 3
+    - name: "Culture"
+      max_items: 3
+    - name: "Radar"
+      description: "Quick hits worth a sentence"
+      max_items: 8
+
+  style:
+    tone: "objective"
+    summary_length: "1-2 sentences max"
+    attribution: "always show source"
+    language: "neutral verbs only, no adjectives of judgment"

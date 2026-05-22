@@ -1,0 +1,13 @@
+# Environment
+.env
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Output (generated daily, don't commit)
+output/
+
+# IDE
+.vscode/
+.idea/
