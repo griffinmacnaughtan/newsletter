@@ -1,18 +1,19 @@
 """
 Reddit Fetcher
-Pulls top posts from configured subreddits using public JSON API (no auth needed).
+Pulls top posts from configured subreddits using RSS feeds (no auth, no rate limits).
+Reddit exposes RSS at /r/{subreddit}/.rss which works from any IP including CI servers.
 """
 
+import re
+import feedparser
 import requests
 import yaml
 from datetime import datetime, timedelta
+from dateutil import parser as dateparser
 from pathlib import Path
 from typing import Optional
-import time
 
-
-USER_AGENT = "DailyBriefing/1.0 (personal newsletter aggregator)"
-REDDIT_BASE = "https://www.reddit.com"
+FEED_TIMEOUT = 10
 
 
 def load_config() -> dict:
@@ -21,45 +22,51 @@ def load_config() -> dict:
         return yaml.safe_load(f)
 
 
-def fetch_subreddit(subreddit: str, top_n: int = 10, hours_back: int = 24) -> list[dict]:
-    """Fetch top posts from a subreddit within the time window."""
-    cutoff_ts = (datetime.now() - timedelta(hours=hours_back)).timestamp()
+def fetch_subreddit_rss(subreddit: str, top_n: int = 10, hours_back: int = 24) -> list[dict]:
+    """Fetch posts from a subreddit via RSS feed."""
+    cutoff = datetime.now() - timedelta(hours=hours_back)
     items = []
 
-    url = f"{REDDIT_BASE}/{subreddit}/hot.json?limit={top_n * 2}"
-    headers = {"User-Agent": USER_AGENT}
+    # Reddit RSS endpoint (not blocked like JSON API)
+    rss_url = f"https://www.reddit.com/{subreddit}/.rss"
 
     try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.raise_for_status()
-        data = response.json()
+        resp = requests.get(rss_url, timeout=FEED_TIMEOUT, headers={
+            "User-Agent": "DailyBriefing/1.0 (personal newsletter aggregator)"
+        })
+        resp.raise_for_status()
+        feed = feedparser.parse(resp.content)
 
-        for post in data.get("data", {}).get("children", []):
-            post_data = post["data"]
-
-            # Skip stickied/pinned posts
-            if post_data.get("stickied", False):
+        for entry in feed.entries:
+            # Parse date
+            published = None
+            if hasattr(entry, "published_parsed") and entry.published_parsed:
+                published = datetime(*entry.published_parsed[:6])
+            elif hasattr(entry, "updated_parsed") and entry.updated_parsed:
+                published = datetime(*entry.updated_parsed[:6])
+            else:
                 continue
 
-            # Skip posts older than cutoff
-            created = post_data.get("created_utc", 0)
-            if created < cutoff_ts:
+            if published < cutoff:
                 continue
 
-            # Skip low-engagement posts (noise filter)
-            score = post_data.get("score", 0)
-            if score < 10:
-                continue
+            # Extract title and clean description
+            title = entry.get("title", "Untitled")
+            description = entry.get("summary", "")
+            description = re.sub(r"<[^>]+>", "", description).strip()
+            if len(description) > 500:
+                description = description[:500] + "..."
+
+            # Get the actual link (not the reddit comments link)
+            url = entry.get("link", "")
 
             items.append({
-                "title": post_data.get("title", "Untitled"),
-                "url": post_data.get("url", ""),
-                "description": post_data.get("selftext", "")[:500] or post_data.get("title", ""),
-                "published": datetime.fromtimestamp(created).isoformat(),
+                "title": title,
+                "url": url,
+                "description": description,
+                "published": published.isoformat(),
                 "source_name": f"Reddit {subreddit}",
-                "source_url": f"{REDDIT_BASE}/{subreddit}",
-                "score": score,
-                "num_comments": post_data.get("num_comments", 0),
+                "source_url": f"https://www.reddit.com/{subreddit}",
                 "type": "reddit",
             })
 
@@ -67,13 +74,13 @@ def fetch_subreddit(subreddit: str, top_n: int = 10, hours_back: int = 24) -> li
                 break
 
     except Exception as e:
-        print(f"[WARN] Failed to fetch {subreddit}: {e}")
+        print(f"[WARN] Failed to fetch {subreddit} RSS: {e}")
 
     return items
 
 
 def fetch_all_reddit(config: Optional[dict] = None, hours_back: int = 24) -> list[dict]:
-    """Fetch from all configured subreddits."""
+    """Fetch from all configured subreddits via RSS."""
     if config is None:
         config = load_config()
 
@@ -93,16 +100,12 @@ def fetch_all_reddit(config: Optional[dict] = None, hours_back: int = 24) -> lis
         categories = sub_config["categories"]
         top_n = sub_config.get("top_n", 10)
 
-        posts = fetch_subreddit(subreddit, top_n=top_n, hours_back=hours_back)
+        posts = fetch_subreddit_rss(subreddit, top_n=top_n, hours_back=hours_back)
 
-        # Tag posts with categories
         for post in posts:
             post["categories"] = categories
 
         all_items.extend(posts)
-
-        # Respect rate limits
-        time.sleep(1)
 
     print(f"[Reddit] Fetched {len(all_items)} posts from {len(reddit_config['subreddits'])} subreddits")
     return all_items
