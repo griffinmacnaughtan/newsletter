@@ -400,11 +400,17 @@
   {% endif %}
 
   <!-- Feedback -->
-  <div class="feedback-row">
-    <div class="feedback-label">How was today's briefing?</div>
-    <a href="{{ feedback_url_great }}" class="feedback-btn fb-great">Great</a>
-    <a href="{{ feedback_url_good }}" class="feedback-btn fb-good">Good</a>
-    <a href="{{ feedback_url_fix }}" class="feedback-btn fb-fix">Needs work</a>
+  <div class="card" style="padding: 22px 28px;">
+    <div class="section-label">Quick feedback</div>
+    <div style="font-size: 13px; color: #888; margin-bottom: 14px;">One tap. Creates a trackable issue. Agent fixes it.</div>
+    <div class="feedback-row" style="text-align: left; margin: 0;">
+      <a href="{{ fb_missing_stories }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Missing stories</a>
+      <a href="{{ fb_wrong_section }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Wrong section</a>
+      <a href="{{ fb_too_much_cbc }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Too much of one source</a>
+      <a href="{{ fb_tone }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Language not neutral</a>
+      <a href="{{ fb_weak_section }}" class="feedback-btn fb-fix" style="display: inline-block; margin: 3px 4px 3px 0;">Section too thin</a>
+      <a href="{{ fb_great }}" class="feedback-btn fb-great" style="display: inline-block; margin: 3px 4px 3px 0;">No notes, great edition</a>
+    </div>
   </div>
 
   <!-- Footer -->
