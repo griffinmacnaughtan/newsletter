@@ -198,7 +198,7 @@ sources:
     - name: "hacker_news"
       endpoint: "https://hacker-news.firebaseio.com/v0"
       categories: ["tech_ai_data"]
-      top_n: 30
+      top_n: 15
 
     - name: "reddit"
       subreddits:

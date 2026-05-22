@@ -3,6 +3,8 @@ RSS Feed Fetcher
 Pulls articles from configured RSS feeds and returns structured items.
 """
 
+import re
+import requests
 import feedparser
 import yaml
 from datetime import datetime, timedelta
@@ -10,11 +12,24 @@ from dateutil import parser as dateparser
 from pathlib import Path
 from typing import Optional
 
+FEED_TIMEOUT = 10  # seconds per feed
+
 
 def load_config() -> dict:
     config_path = Path(__file__).parent.parent / "config.yaml"
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
+
+
+def fetch_single_feed(url: str, timeout: int = FEED_TIMEOUT) -> feedparser.FeedParserDict:
+    """Fetch a feed with a hard timeout using requests first."""
+    try:
+        resp = requests.get(url, timeout=timeout, headers={"User-Agent": "DailyBriefing/1.0"})
+        resp.raise_for_status()
+        return feedparser.parse(resp.content)
+    except Exception:
+        # Fallback: let feedparser try directly (some feeds need special handling)
+        return feedparser.parse(url)
 
 
 def fetch_rss_feeds(config: Optional[dict] = None, hours_back: int = 24) -> list[dict]:
@@ -27,6 +42,8 @@ def fetch_rss_feeds(config: Optional[dict] = None, hours_back: int = 24) -> list
 
     cutoff = datetime.now() - timedelta(hours=hours_back)
     items = []
+    success_count = 0
+    fail_count = 0
 
     for feed_config in config["sources"]["rss"]:
         url = feed_config["url"]
@@ -34,7 +51,8 @@ def fetch_rss_feeds(config: Optional[dict] = None, hours_back: int = 24) -> list
         tier = feed_config.get("tier", 2)
 
         try:
-            feed = feedparser.parse(url)
+            feed = fetch_single_feed(url)
+            success_count += 1
 
             for entry in feed.entries:
                 # Parse publication date
@@ -62,10 +80,8 @@ def fetch_rss_feeds(config: Optional[dict] = None, hours_back: int = 24) -> list
                 elif hasattr(entry, "description"):
                     description = entry.description
 
-                # Strip HTML tags from description (basic)
-                import re
+                # Strip HTML tags
                 description = re.sub(r"<[^>]+>", "", description).strip()
-                # Truncate to first 500 chars
                 if len(description) > 500:
                     description = description[:500] + "..."
 
@@ -82,10 +98,11 @@ def fetch_rss_feeds(config: Optional[dict] = None, hours_back: int = 24) -> list
                 })
 
         except Exception as e:
+            fail_count += 1
             print(f"[WARN] Failed to fetch {url}: {e}")
             continue
 
-    print(f"[RSS] Fetched {len(items)} items from {len(config['sources']['rss'])} feeds")
+    print(f"[RSS] Fetched {len(items)} items from {success_count}/{success_count + fail_count} feeds")
     return items
 
 
