@@ -7,6 +7,9 @@ delivery:
   to:
     - "gmacnaughtan@rogers.com"
     - "morganelackey9@gmail.com"
+    - "rbourdeau777@gmail.com"
+    - "zenticknap@gmail.com"
+    - "nmerkermyers@gmail.com"
   from: "griffin.mac12@gmail.com"
   smtp_server: "smtp.gmail.com"
   smtp_port: 587

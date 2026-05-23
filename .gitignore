@@ -11,3 +11,5 @@ output/
 # IDE
 .vscode/
 .idea/
+
+settings.local.json
