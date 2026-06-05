@@ -43,20 +43,12 @@ def run_fetch(config: dict) -> list[dict]:
     return items
 
 
-def run_curate(raw_items: list[dict]) -> dict:
-    """Step 2: Curate via Claude."""
+def run_curate(raw_items: list[dict]) -> dict | None:
+    """Step 2: Curate via Claude. Returns None if curation fails."""
     print("\n[2/4] Curating with Claude...")
     print(f"  Processing {len(raw_items)} raw items...")
 
     briefing = curate_items(raw_items)
-
-    # Count items in output
-    total_output = sum(
-        len(briefing.get(section, []))
-        for section in ["lead_stories", "tech_ai", "sports", "canada", "world", "environment", "culture", "radar"]
-    )
-    print(f"  Curated down to {total_output} items across all sections")
-
     return briefing
 
 
@@ -193,6 +185,17 @@ def main():
 
     # Step 2: Curate
     briefing = run_curate(raw_items)
+
+    if briefing is None:
+        print("\n" + "=" * 60)
+        print("[ABORT] Curation failed after all retries. NO EMAIL SENT.")
+        print("This is intentional — a blank email is worse than no email.")
+        print("=" * 60)
+        # Still run diagnostics so the health report captures the failure
+        health = run_diagnostics(raw_items, {"date": datetime.now().strftime("%Y-%m-%d")}, config)
+        save_report(health, output_dir)
+        print_report(health)
+        sys.exit(1)
 
     # Save curated output for debugging
     curated_path = output_dir / f"curated_{datetime.now().strftime('%Y%m%d')}.json"

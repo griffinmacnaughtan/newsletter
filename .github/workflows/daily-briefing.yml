@@ -8,6 +8,11 @@ on:
     - cron: "25 12 * * *"  # 7:25 AM EST (winter, UTC-5)
   workflow_dispatch: # Manual trigger for testing
 
+# Prevent duplicate sends if GitHub fires the same cron twice
+concurrency:
+  group: daily-briefing
+  cancel-in-progress: false
+
 jobs:
   send-briefing:
     runs-on: ubuntu-latest
