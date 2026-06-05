@@ -22,14 +22,10 @@ def load_config() -> dict:
 
 
 def fetch_single_feed(url: str, timeout: int = FEED_TIMEOUT) -> feedparser.FeedParserDict:
-    """Fetch a feed with a hard timeout using requests first."""
-    try:
-        resp = requests.get(url, timeout=timeout, headers={"User-Agent": "DailyBriefing/1.0"})
-        resp.raise_for_status()
-        return feedparser.parse(resp.content)
-    except Exception:
-        # Fallback: let feedparser try directly (some feeds need special handling)
-        return feedparser.parse(url)
+    """Fetch a feed with a hard timeout using requests. No fallback to avoid hangs."""
+    resp = requests.get(url, timeout=timeout, headers={"User-Agent": "DailyBriefing/1.0"})
+    resp.raise_for_status()
+    return feedparser.parse(resp.content)
 
 
 def fetch_rss_feeds(config: Optional[dict] = None, hours_back: int = 24) -> list[dict]:

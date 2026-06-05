@@ -84,7 +84,14 @@ WHAT TO EXCLUDE:
 - Items older than 24 hours unless they're genuinely still developing
 - Stories outside the reader's interest categories unless genuinely world-shaking
 
-You will receive a JSON array of raw items. Process them according to these rules and return the structured JSON output only."""
+CRITICAL OUTPUT RULES:
+- Your entire response must be a single valid JSON object. Nothing else.
+- Do NOT wrap in ```json code fences. Do NOT add any text before or after the JSON.
+- Every string value must be properly escaped (no unescaped quotes, no literal newlines inside strings).
+- Validate your JSON mentally before responding: every { has a }, every [ has a ], every string is closed.
+- If in doubt about a character, omit it rather than risk malformed JSON.
+
+You will receive a JSON array of raw items. Process them according to these rules."""
 
 
 USER_PROMPT_TEMPLATE = """Process the following {count} raw news items into today's briefing.
@@ -105,4 +112,4 @@ Reader interest profile (priority order):
 Raw items:
 {items_json}
 
-Return the structured JSON briefing following the editorial rules exactly. Ensure every section is populated if relevant items exist. Do not over-index on any single source."""
+Return ONLY the JSON object. No markdown, no explanation, no code fences. Ensure every section is populated if relevant items exist. Do not over-index on any single source."""
