@@ -118,15 +118,20 @@ interests:
 
 # --- Sources ---
 # Organized by type. Each source tagged with categories it covers.
+# Dead feeds removed 2026-06-23: Reuters RSS (DNS dead), TSN RSS (404),
+# Golf Channel (404), Anthropic blog (404), CBC Climate (400), Exclaim (404)
 sources:
   rss:
-    # Wire Services (primary factual sources)
-    - url: "https://feeds.reuters.com/reuters/topNews"
+    # Wire Services / Top News
+    - url: "https://rss.app/feeds/v1.1/tgkYDjGHBvHMhFia.xml"
       categories: ["geopolitics", "canadian_politics"]
       tier: 1
-    - url: "https://feeds.reuters.com/reuters/technologyNews"
-      categories: ["tech_ai_data"]
+    - url: "https://www.aljazeera.com/xml/rss/all.xml"
+      categories: ["geopolitics"]
       tier: 1
+    - url: "https://feeds.nbcnews.com/nbcnews/public/world"
+      categories: ["geopolitics"]
+      tier: 2
 
     # Canadian News (wire-style)
     - url: "https://www.cbc.ca/webfeed/rss/rss-topstories"
@@ -147,6 +152,9 @@ sources:
     - url: "https://www.theglobeandmail.com/arc/outboundfeeds/rss/category/business/technology/"
       categories: ["tech_ai_data"]
       tier: 1
+    - url: "https://www.ctvnews.ca/rss/ctvnews-ca-top-stories-public-rss-1.822009"
+      categories: ["canadian_politics", "geopolitics"]
+      tier: 1
 
     # Tech / AI / Data
     - url: "https://techcrunch.com/feed/"
@@ -161,39 +169,36 @@ sources:
     - url: "https://arstechnica.com/feed/"
       categories: ["tech_ai_data"]
       tier: 2
-    - url: "https://feeds.reuters.com/reuters/businessNews"
-      categories: ["tech_ai_data", "geopolitics"]
-      tier: 1
     - url: "https://blog.google/technology/ai/rss/"
       categories: ["tech_ai_data"]
       tier: 2
     - url: "https://openai.com/blog/rss.xml"
       categories: ["tech_ai_data"]
       tier: 2
-    - url: "https://www.anthropic.com/rss.xml"
+    - url: "https://www.wired.com/feed/rss"
       categories: ["tech_ai_data"]
       tier: 2
 
     # Sports
-    - url: "https://www.tsn.ca/rss/hockey"
-      categories: ["sports_hockey"]
-      tier: 1
     - url: "https://www.sportsnet.ca/feed/"
       categories: ["sports_hockey", "sports_other"]
       tier: 1
-    - url: "https://www.tsn.ca/rss/golf"
-      categories: ["sports_golf"]
+    - url: "https://www.nhl.com/rss/news"
+      categories: ["sports_hockey"]
       tier: 1
-    - url: "https://www.golfchannel.com/rss"
-      categories: ["sports_golf"]
+    - url: "https://www.espn.com/espn/rss/nhl/news"
+      categories: ["sports_hockey"]
       tier: 2
     - url: "https://www.espn.com/espn/rss/golf/news"
+      categories: ["sports_golf"]
+      tier: 2
+    - url: "https://www.pgatour.com/feeds/news.rss"
       categories: ["sports_golf"]
       tier: 2
     - url: "https://www.mlb.com/feeds/news/rss.xml"
       categories: ["sports_other"]
       tier: 2
-    - url: "https://www.tsn.ca/rss/soccer"
+    - url: "https://www.espn.com/espn/rss/soccer/news"
       categories: ["sports_other"]
       tier: 2
 
@@ -201,11 +206,14 @@ sources:
     - url: "https://thenarwhal.ca/feed/"
       categories: ["environment"]
       tier: 2
-    - url: "https://www.cbc.ca/webfeed/rss/rss-climate"
+    - url: "https://www.carbonbrief.org/feed/"
       categories: ["environment"]
-      tier: 1
+      tier: 2
+    - url: "https://insideclimatenews.org/feed/"
+      categories: ["environment"]
+      tier: 2
 
-    # Geopolitics (adding dedicated feeds)
+    # Geopolitics
     - url: "https://feeds.bbci.co.uk/news/world/rss.xml"
       categories: ["geopolitics"]
       tier: 1
@@ -214,11 +222,14 @@ sources:
       tier: 2
 
     # Music / Art / Culture
-    - url: "https://exclaim.ca/rss"
-      categories: ["music_art"]
+    - url: "https://www.blogto.com/feed/"
+      categories: ["music_art", "canadian_politics"]
       tier: 2
     - url: "https://nowtoronto.com/feed"
       categories: ["music_art", "canadian_politics"]
+      tier: 2
+    - url: "https://pitchfork.com/feed/feed-news/rss"
+      categories: ["music_art"]
       tier: 2
 
   # Public APIs (no auth required)

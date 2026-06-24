@@ -7,7 +7,7 @@ Includes retry logic for malformed JSON and truncation.
 import json
 import re
 from datetime import datetime
-from anthropic import Anthropic
+from anthropic import Anthropic, APIError
 from .prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 
 MAX_RETRIES = 3
@@ -82,14 +82,23 @@ def curate_items(raw_items: list[dict], date: str = None) -> dict:
 
         print(f"  [Attempt {attempt}/{MAX_RETRIES}] Calling Claude (max_tokens={max_tokens})...")
 
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=max_tokens,
-            system=SYSTEM_PROMPT,
-            messages=[
-                {"role": "user", "content": user_prompt}
-            ],
-        )
+        try:
+            response = client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=max_tokens,
+                system=SYSTEM_PROMPT,
+                messages=[
+                    {"role": "user", "content": user_prompt}
+                ],
+            )
+        except APIError as e:
+            print(f"  [ERROR] Anthropic API error on attempt {attempt}: {e}")
+            if attempt < MAX_RETRIES:
+                print("  Retrying...")
+                continue
+            else:
+                print(f"  [FATAL] API error after {MAX_RETRIES} attempts.")
+                return None
 
         # Check truncation
         if response.stop_reason == "max_tokens":

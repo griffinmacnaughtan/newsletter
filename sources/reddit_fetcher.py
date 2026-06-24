@@ -5,6 +5,7 @@ Reddit exposes RSS at /r/{subreddit}/.rss which works from any IP including CI s
 """
 
 import re
+import time
 import feedparser
 import requests
 import yaml
@@ -14,6 +15,7 @@ from pathlib import Path
 from typing import Optional
 
 FEED_TIMEOUT = 10
+REDDIT_DELAY = 3  # seconds between subreddit requests to avoid 429s
 
 
 def load_config() -> dict:
@@ -95,10 +97,14 @@ def fetch_all_reddit(config: Optional[dict] = None, hours_back: int = 24) -> lis
     if not reddit_config:
         return []
 
-    for sub_config in reddit_config["subreddits"]:
+    for i, sub_config in enumerate(reddit_config["subreddits"]):
         subreddit = sub_config["name"]
         categories = sub_config["categories"]
         top_n = sub_config.get("top_n", 10)
+
+        # Rate limit: wait between requests to avoid Reddit 429s
+        if i > 0:
+            time.sleep(REDDIT_DELAY)
 
         posts = fetch_subreddit_rss(subreddit, top_n=top_n, hours_back=hours_back)
 
