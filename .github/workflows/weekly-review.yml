@@ -148,6 +148,14 @@ jobs:
           print(body)
           PYEOF
 
+      - name: Ensure labels exist
+        if: steps.review.outputs.has_issues == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create "health" --color 0e8a16 --description "Automated health issue" 2>/dev/null || true
+          gh label create "feedback" --color 1d76db --description "Reader feedback" 2>/dev/null || true
+
       - name: Create issue if problems found
         if: steps.review.outputs.has_issues == 'true'
         env:
