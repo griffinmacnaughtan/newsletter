@@ -90,6 +90,7 @@ CRITICAL OUTPUT RULES:
 - Every string value must be properly escaped (no unescaped quotes, no literal newlines inside strings).
 - Validate your JSON mentally before responding: every { has a }, every [ has a ], every string is closed.
 - If in doubt about a character, omit it rather than risk malformed JSON.
+- Every item MUST include a "url" field copied verbatim from the raw input. Never leave url empty or omit it.
 
 You will receive a JSON array of raw items. Process them according to these rules."""
 

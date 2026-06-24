@@ -14,6 +14,24 @@ MAX_RETRIES = 3
 SECTIONS = ["lead_stories", "tech_ai", "sports", "canada", "world", "environment", "culture", "radar"]
 
 
+def _validate_urls(briefing: dict) -> dict:
+    """Drop items with empty or invalid URLs so every headline is clickable."""
+    dropped = 0
+    for section in SECTIONS:
+        items = briefing.get(section, [])
+        valid = []
+        for item in items:
+            url = (item.get("url") or "").strip()
+            if url and url.startswith("http"):
+                valid.append(item)
+            else:
+                dropped += 1
+        briefing[section] = valid
+    if dropped:
+        print(f"  [URL] Dropped {dropped} items with missing/invalid URLs")
+    return briefing
+
+
 def _extract_json(text: str) -> str:
     """Extract JSON from Claude's response, handling code fences and preamble."""
     # Strip ```json ... ``` blocks
@@ -137,6 +155,8 @@ def curate_items(raw_items: list[dict], date: str = None) -> dict:
                 print("  [ERROR] All attempts produced empty briefings.")
                 return None
 
+        briefing = _validate_urls(briefing)
+        total = _count_items(briefing)
         print(f"  Curated down to {total} items across all sections")
         return briefing
 
